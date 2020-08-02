@@ -17,7 +17,7 @@
         <!-- App Css-->
         <link rel="stylesheet" href="cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
         <link href="<?= base_url();?>assets/css/app.min.css" rel="stylesheet" type="text/css" />
-
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     </head>
 
     <body data-topbar="colored">
@@ -236,16 +236,13 @@
         <!-- END layout-wrapper -->
 
         <!-- JAVASCRIPT -->
-        <script src="<?= base_url();?>assets/libs/jquery/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <script src="<?= base_url();?>assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="<?= base_url();?>assets/libs/metismenu/metisMenu.min.js"></script>
         <script src="<?= base_url();?>assets/libs/simplebar/simplebar.min.js"></script>
         <script src="<?= base_url();?>assets/libs/node-waves/waves.min.js"></script>
 
         <script src="https://unicons.iconscout.com/release/v2.0.1/script/monochrome/bundle.js"></script>
-        <!-- Buttons examples -->
-        <script src="<?= base_url();?>assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-        <script src="<?= base_url();?>assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
         <!-- Required datatable js -->
         <script src="<?= base_url();?>assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
         <script src="<?= base_url();?>assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -253,8 +250,166 @@
         <script src="<?= base_url();?>assets/js/pages/datatables.init.js"></script>
         <script src="<?= base_url();?>assets/js/app.js"></script>
         <!-- Responsive examples -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         <script src="<?= base_url();?>assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
         <script src="<?= base_url();?>assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+        <script type="text/javascript">
+	$(document).on("click", "#tambah", function(e){
+		e.preventDefault();
+	var produk = $('#produk').val();
+	var tahun = $('#tahun').val();
+	var unit = $('#unit').val();
+	var harga = $('#harga').val();
+	var biaya_variabel = $('#biaya_variabel').val();
+	var biaya_tetap = $('#biaya_tetap').val();
+	var mc = $('#mc').val();
+    var total_penjualan = harga * unit;
 
+    $.ajax({
+        url: "<?= base_url()?>penjualan/tambah",
+    type: "post",
+    dataType: "json",
+    data: {
+        produk: produk,
+        tahun: tahun,
+        unit: unit,
+        harga: harga,
+        biaya_variabel: biaya_variabel,
+        biaya_tetap: biaya_tetap,
+        mc: mc,
+        total_penjualan: total_penjualan
+    },
+    success: function(data){
+        $('#exampleModal').modal('hide');
+        
+        if(data.message == "success"){
+            toastr["success"](data.message);
+            toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "1000",
+            "hideDuration": "2000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+            }
+        }else{
+            toastr["error"](data.message);
+            toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "1000",
+            "hideDuration": "2000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+            }
+        }
+        
+    }
+    
+    });
+        $('#form')[0].reset();
+        location.reload();
+	});
+</script>
+        <!-- <script type="text/javascript">
+	var save_method;
+	var table;
+
+    function add_data(){
+        save_method = 'add';
+        $('#form')[0].reset();
+        $('#modal_form').modal('show');
+    }
+
+	function save() {
+		var url;
+
+		if (save_method == 'add') {
+			url = '<?= base_url('Penjualan/tambah');?>';
+		} else {
+            url = '<?= base_url('Penjualan/ubah');?>';
+        }
+		$.ajax({
+			url: url,
+			type: "POST",
+			data: $('#form').serialize(),
+			dataType: "JSON",
+			success: function (data) {
+				$('#modal_form').modal('hide');
+				location.reload();
+			},
+            error: function(jqXHR, textStatus, errorThrown){
+                alert('Error Tambah Data');
+            }
+		});
+	}
+    function edit_data(id){
+        save_method = 'update';
+        $('#form')[0].reset();
+
+        //load data
+        $.ajax({
+            url: "<?= base_url('Penjualan/ajax_edit/');?>/"+id,
+            type: "GET",
+			dataType: "JSON",
+			success: function (data) {
+				$('[name="id_lapkeu"]').val(data.id_lapkeu);
+				$('[name="produk"]').val(data.produk);
+				$('[name="tahun"]').val(data.tahun);
+				$('[name="unit"]').val(data.unit);
+				$('[name="harga"]').val(data.harga);
+				$('[name="biaya_variabel"]').val(data.biaya_variabel);
+				$('[name="biaya_tetap"]').val(data.biaya_tetap);
+				$('[name="mc"]').val(data.mc);
+
+				$('#modal_form').modal('show');
+				$('.modal_title').text('Edit Data Penjualan');
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert('Error Get Data From Ajax');
+			}
+        })
+    }
+	function buat_rencana(id_lapkeu) {
+		save_method = 'update';
+		$('#form')[0].reset();
+        $('#modal_form').modal('show');
+		//load data
+		$.ajax({
+			url: "<?= base_url('penjualan/ajax_buat/') ?>" + id_lapkeu,
+			type: "GET",
+			dataType: "JSON",
+			success: function (data) {
+				$('[name="laba_bersih"]').val(data.laba_bersih);
+				$('#modal_form').modal('show');
+				$('.modal_title').text('Buat Rencana Penjualan');
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert('Gagal');
+			}
+		});
+	} 
+
+</script>-->
     </body>
 </html>
